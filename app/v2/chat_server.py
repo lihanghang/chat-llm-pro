@@ -1,4 +1,11 @@
+import os
+import sys
+
 import gradio as gr
+
+curPath = os.path.abspath(os.path.dirname(__file__))
+rootPath = os.path.split(curPath)[0]
+sys.path.insert(0, os.path.split(rootPath)[0])
 
 from app import host, port, openai_key
 from data import example
@@ -23,8 +30,8 @@ def del_all_examples():
     return gpt.get_all_examples()
 
 
-with gr.Blocks() as demo:
-    gr.Markdown(f"# NLP应用场景演示")
+with gr.Blocks(css="footer {visibility: hidden}", title='ChatLLM for NLP') as demo:
+    gr.Markdown(f"<h1 style='text-align: center;'>NLP应用场景演示</h1>")
     gr.Markdown(f'> Model by {model_type}. Contact us via https://www.memect.cn/ .')
     with gr.Tab("模型推理"):
         input_doc = gr.Textbox(label="input", value="介绍下文因互联")

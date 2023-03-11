@@ -19,14 +19,20 @@
 3. 摘要生成
 4. 基于源码的模型使用，更加灵活
 """
+import os
+import sys
+
 import openai
 import gradio as gr
 
+curPath = os.path.abspath(os.path.dirname(__file__))
+rootPath = os.path.split(curPath)[0]
+sys.path.insert(0, os.path.split(rootPath)[0])
 from app import openai_key, host
 from data import example, prompt_text
 
 openai.api_key = openai_key
-model_type = 'MemLLM'
+model_type = 'MemFinLLM'
 
 
 def extract(text: str, task_type) -> str:
@@ -71,7 +77,8 @@ demo = gr.Interface(
         description=f'Model by {model_type}',
         examples=example,
         title="NLP应用场景演示",
-        allow_flagging='never'
+        allow_flagging='never',
+        css="footer {visibility: hidden}"
     )
 
 
