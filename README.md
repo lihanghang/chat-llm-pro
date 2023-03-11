@@ -12,3 +12,6 @@ source venv/bin/activate
 
 ## 接口服务
 1. api/
+
+---
+获取体验key可联系lihanghang@memect.co
