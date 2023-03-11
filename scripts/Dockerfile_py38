@@ -1,0 +1,17 @@
+FROM ubuntu:20.04
+#============= 安装python3============
+##使用阿里云的源
+RUN  sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list
+RUN  sed -i s@/security.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list
+RUN apt-get update
+
+ENV PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple/
+RUN apt-get install -y zlib1g.dev libjpeg9-dev \
+        && apt-get install -y python3.8 python3-pip python3.8-distutils python3.8-dev \
+        && pip3 install virtualenv
+RUN pip3 install --upgrade pip
+RUN apt-get clean
+# #============= 支持中文 ==================
+RUN apt-get install -y language-pack-zh-hans
+RUN locale-gen zh_CN.UTF-8 && locale-gen en_US.UTF-8
+ENV LC_ALL='zh_CN.UTF-8'
