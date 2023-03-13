@@ -7,14 +7,14 @@ curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.insert(0, os.path.split(rootPath)[0])
 
-from app import host, port, openai_key
+from app import host, port, openai_key, model_name
 from data import example
 from src.gpt import set_openai_key, GPT, Example
 
 set_openai_key(openai_key)
 model_type = 'MemFinLLM'
 
-gpt = GPT(engine="gpt-3.5-turbo",
+gpt = GPT(engine=model_name,
           temperature=0.6,
           max_tokens=1024
           )

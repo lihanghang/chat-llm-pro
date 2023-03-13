@@ -9,9 +9,26 @@ source venv/bin/activate
 ```
 ## web服务-基于gradio
 1. app/
+2. 示例
+   - ![task_example](doc/task_demo.png)
+   - ![add_example](doc/add_example.png)
 
 ## 接口服务
-1. api/
+1. api
+
+## 其他
+### 局限
+1. 调参能力有限。响应结果的干预手段有限
+2. 需要走第三方网络请求，稳定性不强，如何内网部署使用
+### 进一步探索
+1. 服务器部署
+2. DEMO交互体验
+3. 摘要生成
+4. 基于源码的模型使用，更加灵活
+### 参考文档
+1. gpt-3 https://platform.openai.com/docs/models/gpt-3
+2. web界面 https://gradio.app/ 
+3. gpt3.5-api https://platform.openai.com/docs/guides/chat/instructing-chat-models
 
 ---
 获取体验key可联系lihanghang@memect.co
