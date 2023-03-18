@@ -8,10 +8,13 @@ source venv/bin/activate
 
 ```
 ## web服务-基于gradio
-1. app/
-2. 示例
-   - ![task_example](doc/task_demo.png)
-   - ![add_example](doc/add_example.png)
+
+<details><summary><b>问答</b></summary>
+![task_example](docs/task_demo.png)
+</details>
+<details><summary><b>增加知识</b></summary>
+![add_example](docs/add_example.png)
+</details>
 
 ## 接口服务
 1. api
