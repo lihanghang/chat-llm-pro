@@ -57,7 +57,7 @@ demo = gr.Interface(
         inputs=[
             gr.Textbox(lines=10, label="Text", max_lines=20),
             gr.Radio(
-                choices=["摘要生成", "事件抽取", "问答", "实体抽取", "写作"],
+                choices=list(prompt_text.keys()),
                 label="任务类型",
                 value='问答'
             )

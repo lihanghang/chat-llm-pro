@@ -1,6 +1,5 @@
 import os
 import sys
-
 import gradio as gr
 
 curPath = os.path.abspath(os.path.dirname(__file__))
@@ -8,7 +7,7 @@ rootPath = os.path.split(curPath)[0]
 sys.path.insert(0, os.path.split(rootPath)[0])
 
 from app import host, port, openai_key, model_name
-from data import example
+from data import example, prompt_text
 from src.gpt import set_openai_key, GPT, Example
 
 set_openai_key(openai_key)
@@ -34,8 +33,11 @@ with gr.Blocks(css="footer {visibility: hidden}", title='ChatLLM for NLP') as de
     gr.Markdown(f"<h1 style='text-align: center;'>NLP应用场景演示</h1>")
     gr.Markdown(f'> Model by {model_type}. Contact us via https://www.memect.cn/ .')
     with gr.Tab("模型推理"):
-        input_doc = gr.Textbox(label="input", value="介绍下文因互联")
-        task_type = gr.Radio(choices=["摘要生成", "事件抽取", "问答", "实体抽取", "写作", "公告分类", "情感分类"],
+        with gr.Tab("文本"):
+            input_doc = gr.Textbox(label="input", value="介绍下文因互联")
+        with gr.Tab("上传文档"):
+            pdf = gr.File(type='file', label='上传分析文档')
+        task_type = gr.Radio(choices=list(prompt_text.keys()),
                              label="任务类型", value='问答')
         output_ret = gr.Text(label='output')
         submit = gr.Button("Submit")
