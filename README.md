@@ -9,10 +9,11 @@ source venv/bin/activate
 ```
 ## web服务-基于gradio
 
-<details><summary><b>问答</b></summary>
+<details open><summary><b>问答</b></summary>
 ![task_example](docs/task_demo.png)
-</details>
-<details><summary><b>增加知识</b></summary>
+</details>  
+
+<details open><summary><b>增加知识</b></summary>
 ![add_example](docs/add_example.png)
 </details>
 
