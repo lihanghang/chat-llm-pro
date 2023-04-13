@@ -2,11 +2,19 @@
 > 从2022年下半年到2023，Chatgpt显得低调且惊艳，本项目主要基于各类语言模型coding NLP相关应用。
 ##  run env
 ```shell
+# pipreqs --force
 # python>=3.8
 virtualenv -p python venv
 source venv/bin/activate
 
 ```
+## 编译镜像
+
+```shell
+$ docker-compose build
+
+```
+
 ## web服务-基于gradio
 
 ![task_example](docs/task_demo.png)
@@ -30,4 +38,4 @@ source venv/bin/activate
 3. gpt3.5-api https://platform.openai.com/docs/guides/chat/instructing-chat-models
 
 ---
-获取体验key可联系lihanghang@memect.co
+获取体验key或文因金融语言模型可联系lihanghang@memect.co

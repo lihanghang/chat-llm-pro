@@ -1,3 +1,11 @@
-gradio==3.20.1
-openai==0.27.2
-python-dotenv~=1.0.0
+-i https://mirrors.aliyun.com/pypi/simple/
+faiss_cpu==1.7.3
+Flask==2.2.3
+gradio==3.25.0
+kor==0.8.0
+numpy==1.24.2
+openai==0.27.3
+python-dotenv==1.0.0
+qdrant_client==1.1.4
+requests==2.28.2
+tqdm==4.65.0

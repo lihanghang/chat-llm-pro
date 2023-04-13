@@ -1,16 +1,20 @@
 version: '3'
 services:
-  build_base_images:
-    build:
-      dockerfile: ./scripts/Dockerfile_py38
-    image: mem_python:3.8
-
   chat_client:
     container_name: chat_llm
     build:
+      context: ./
       dockerfile: ./scripts/Dockerfile
     image: chat_llm:0.0.1
-    volumes:
-      - .env:/opt/apps/chat_llm/.env # app config
+    env_file:
+      - .env
     ports:
-      - "9999:9999" # host:container
+      - "9998:9999" # host:container:
+
+#  qdrant_client:
+#    container_name: qdrant_embedding
+#    image: qdrant/qdrant:latest
+#    volumes:
+#      - $PWD/qdrant:/store/storage/store
+#    ports:
+#      - "6333:6333"

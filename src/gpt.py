@@ -4,6 +4,7 @@ API."""
 import openai
 import uuid
 
+from app import api_type
 from data import prompt_text
 
 
@@ -54,7 +55,7 @@ class GPT:
                  max_tokens=100,
                  input_prefix="输入: ",
                  input_suffix="\n",
-                 output_prefix="输出: ",
+                 output_prefix="",
                  output_suffix="\n\n",
                  append_output_prefix_to_query=False):
         self.examples = {}
@@ -114,10 +115,17 @@ class GPT:
             q = q + self.output_prefix
         return q
 
-    def get_query_message(self, content):
+    def get_query_message(self, content, context):
         """Create the query for the API request."""
-        print(content)
-        return [{"role": self.role, "content": content}]
+        user_group = [{"role": self.role, "content": content}]
+        if context:
+            sys_user = {"role": "system",
+                        "content": f'''您是一个AI助手，您得到了以下长文档的提取部分和一个问题。根据提供的上下文等进行交流式回答。"
+                                   f"基于以下内容，简洁和专业的来回答用户的问题。如果无法从中得到答案，请说 "不知道" 或 "没有足够的相关信息"，不要试图编造答案。答案请使用中文。"
+                                   f"然后请说出自行回答的内容“我的个人分析是：\n{context}'''
+                        }
+            user_group.append(sys_user)
+        return user_group
 
     def generate_prompt(self, text, task_type):
         """
@@ -130,19 +138,20 @@ class GPT:
             q = prompt + self.output_suffix
         return q
 
-    def submit_request(self, text, task_type):
+    def submit_request(self, text, task_type, context):
         """Calls the OpenAI API with the specified parameters.
         """
         response = openai.ChatCompletion.create(model=self.get_engine(),
-                                                messages=self.get_query_message(self.generate_prompt(text, task_type)),
+                                                messages=self.get_query_message(self.generate_prompt(text, task_type),
+                                                                                context=context),
                                                 max_tokens=self.get_max_tokens(),
                                                 temperature=self.get_temperature())
         return response
 
-    def get_top_reply(self, text, task_type):
+    def get_top_reply(self, text, task_type, context=''):
         """Obtains the best result as returned by the API."""
-        response = self.submit_request(text, task_type)
-        return response.choices[0]['message']['content']
+        response = self.submit_request(text, task_type, context)
+        return response.choices[0]['message']['content'], response['usage']['total_tokens']
 
     def format_example(self, ex):
         """Formats the input, output pair."""
