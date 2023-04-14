@@ -15,26 +15,23 @@ $ docker-compose build
 
 ```
 
-## web服务-基于gradio
+## Web UI
 
 ![task_example](docs/task_demo.png)
 ![add_example](docs/add_example.png)
 
-## 接口服务
-1. api
 
 ## 其他
 ### 局限
 1. 调参能力有限。响应结果的干预手段有限
 2. 需要走第三方网络请求，稳定性不强，如何内网部署使用
-### 进度
--[x] 实现了docker化服务器部署
--[x] 基于gradio的UI DEMO交互体验 
--[x] 支持摘要生成，问答，情感分类的场景
--[x] 支持选择模型
--[x] 支持类chatpdf功能
--[x] 引入langchain工具，加速应用构建
--[] 基于langchin工具进行文档抽取server开发。
+### 进度[x] 实现了docker化服务器部署
+- [x] 基于gradio的UI DEMO交互体验 
+- [x] 支持摘要生成，问答，情感分类的场景
+- [x] 支持选择模型
+- [x] 支持类chatpdf功能
+- [x] 引入langchain工具，加速应用构建
+- [ ] 基于langchin工具进行文档抽取server开发。
 
 ### 参考文档
 1. gpt-3 https://platform.openai.com/docs/models/gpt-3
