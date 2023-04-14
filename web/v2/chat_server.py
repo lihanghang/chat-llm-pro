@@ -18,7 +18,7 @@ rootPath = os.path.split(curPath)[0]
 sys.path.insert(0, os.path.split(rootPath)[0])
 
 from src.langchain.extract import parser_pdf, extract_doc, chat_mem_fin_llm
-from app import host, port, model_name, openai_key, api_version, api_base, api_type
+from web import host, port, model_name, openai_key, api_version, api_base, api_type
 from data import example, prompt_text
 from src.gpt import set_openai_key, GPT, Example
 from src.utils.data_store import doc2embedding, save_embedding
@@ -228,15 +228,15 @@ with gr.Blocks(css="footer {visibility: hidden}", title='ChatLLM is all you need
         clear = gr.Button("Clear")
         clear.click(lambda: None, None, chatbot, queue=False)
 
-    with gr.Tab("docExtractor（文档抽取）开发中"):
-        file_output = gr.File(label="上传文档")
-
-        choice_model = gr.Dropdown(choices=["MemectLLM", "GPT35"], value="MemectLLM", label="选择模型")
-        schema = gr.Code(language='python', label="定义抽取要素")
-        extract_result = gr.Textbox(label='result')
-
-        doc_btn = gr.Button("extract")
-        doc_btn.click(extract_chain, inputs=[file_output, schema, choice_model], outputs=extract_result)
+    # with gr.Tab("docExtractor（文档抽取）开发中"):
+    #     file_output = gr.File(label="上传文档")
+    #
+    #     choice_model = gr.Dropdown(choices=["MemectLLM", "GPT35"], value="MemectLLM", label="选择模型")
+    #     schema = gr.Code(language='python', label="定义抽取要素")
+    #     extract_result = gr.Textbox(label='result')
+    #
+    #     doc_btn = gr.Button("extract")
+    #     doc_btn.click(extract_chain, inputs=[file_output, schema, choice_model], outputs=extract_result)
 
     with gr.Tab("增加模型知识"):
         with gr.Column():  # 列排列

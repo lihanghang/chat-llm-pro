@@ -27,11 +27,15 @@ $ docker-compose build
 ### 局限
 1. 调参能力有限。响应结果的干预手段有限
 2. 需要走第三方网络请求，稳定性不强，如何内网部署使用
-### 进一步探索
-1. 服务器部署
-2. DEMO交互体验
-3. 摘要生成
-4. 基于源码的模型使用，更加灵活
+### 进度
+-[x] 实现了docker化服务器部署
+-[x] 基于gradio的UI DEMO交互体验 
+-[x] 支持摘要生成，问答，情感分类的场景
+-[x] 支持选择模型
+-[x] 支持类chatpdf功能
+-[x] 引入langchain工具，加速应用构建
+-[] 基于langchin工具进行文档抽取server开发。
+
 ### 参考文档
 1. gpt-3 https://platform.openai.com/docs/models/gpt-3
 2. web界面 https://gradio.app/ 

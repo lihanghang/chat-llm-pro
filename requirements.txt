@@ -1,7 +1,7 @@
--i https://mirrors.aliyun.com/pypi/simple/
+faiss==1.5.3
 faiss_cpu==1.7.3
 Flask==2.2.3
-gradio==3.25.0
+gradio==3.26.0
 kor==0.8.0
 numpy==1.24.2
 openai==0.27.3

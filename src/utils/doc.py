@@ -12,7 +12,7 @@ import logging
 
 from tqdm import tqdm
 
-from app import api_server
+from web import api_server
 from src.utils.doc_enum import DocField
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

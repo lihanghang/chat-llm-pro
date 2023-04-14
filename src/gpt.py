@@ -4,7 +4,7 @@ API."""
 import openai
 import uuid
 
-from app import api_type
+from web import api_type
 from data import prompt_text
 
 

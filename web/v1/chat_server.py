@@ -17,7 +17,7 @@ import gradio as gr
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.insert(0, os.path.split(rootPath)[0])
-from app import openai_key, host
+from web import openai_key, host
 from data import example, prompt_text
 
 openai.api_key = openai_key
