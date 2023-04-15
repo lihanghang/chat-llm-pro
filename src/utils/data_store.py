@@ -14,11 +14,14 @@ def doc2embedding(parser_file_path):
        Returns: dict
 
        """
-    d = 1536
-    index = faiss.IndexFlatL2(d)
+
     emb_data = create_embedding(parser_file_path)
     emb = np.array([emm[1] for emm in emb_data])  # 获取向量值
     data = [emm[0] for emm in emb_data]  # 获取向量对应的文本数据
+
+    d = emb.shape[1]
+    logging.info(f'd={d}')
+    index = faiss.IndexFlatL2(d)
     index.add(emb)
     return {"index": index, "embedding": data}
 

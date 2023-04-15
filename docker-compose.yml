@@ -8,13 +8,7 @@ services:
     image: chat_llm:0.0.2
     env_file:
       - .env
+    volumes:
+      - $PWD/data/store:data/store
     ports:
-      - "9998:9999" # host:container:
-
-#  qdrant_client:
-#    container_name: qdrant_embedding
-#    image: qdrant/qdrant:latest
-#    volumes:
-#      - $PWD/qdrant:/store/storage/store
-#    ports:
-#      - "6333:6333"
+      - "9998:9999" # host:container

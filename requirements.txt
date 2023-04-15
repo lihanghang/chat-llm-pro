@@ -1,4 +1,5 @@
 -i https://pypi.tuna.tsinghua.edu.cn/simple
+sentence_transformers
 faiss_cpu==1.7.3
 Flask==2.2.3
 gradio==3.26.0

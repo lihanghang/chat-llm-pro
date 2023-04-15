@@ -12,7 +12,6 @@ import sys
 import gradio as gr
 import openai
 
-
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.insert(0, os.path.split(rootPath)[0])
@@ -27,8 +26,10 @@ from src.utils.doc import parser_doc, hashcode_with_file, get_file_ext_size
 
 
 model_type = 'openai'
+
 data_store_base_path = 'data/store'  # 生成文件父级目录
 store_origin_file_dir = None
+gpt:object = None
 mem_api_base = os.getenv('MEM_FIN_OPENAI_API')
 
 
@@ -36,12 +37,18 @@ def load_model(model_type):
     """
     根据模型类型加载不同参数
     """
-    if model_type == 'azure':
+    global gpt
+
+    # 使用同一实例，可以考虑单例模式进行优化
+    if gpt is not None and openai.api_type == model_type:
+        logging.info(f'reload {openai.api_type}')
+        return gpt
+    elif model_type == 'azure':
         set_openai_key(azure_openai_key, api_version, api_base, api_type)
         gpt = GPT(engine=azure_model_name, temperature=0.6, max_tokens=1024)
         return gpt
 
-    elif model_type == 'openai':
+    elif model_type == 'open_ai':
         set_openai_key(office_openai_key)
         gpt = GPT(engine=office_model_name, temperature=0.6, max_tokens=1024)
         return gpt
@@ -126,7 +133,7 @@ def chat_doc(query, model_type, task_type='问答'):
 
         text = "".join(text for _, text in enumerate(context))
         logging.info(f'Load model {model_type}')
-        if model_type in ['azure', 'openai']:
+        if model_type in ['azure', 'open_ai']:
             gpt = load_model(model_type)
             ret, tokens_num = gpt.get_top_reply(query, task_type, text, model_type)  # 请求LLM
             logging.debug(f'Context:{text}\nOutput:{ret}')
@@ -142,12 +149,10 @@ def chat_doc(query, model_type, task_type='问答'):
 
 def add_examples(issue, reply):
     """Generate QA example"""
-    gpt = load_model(model_type)
     return gpt.add_example(Example(issue, reply))
 
 
 def del_all_examples():
-    gpt = load_model(model_type)
     [gpt.delete_example(ex_id) for ex_id, _ in gpt.get_all_examples().items()]
     return gpt.get_all_examples()
 
@@ -160,10 +165,11 @@ def task_with_chat(input_txt, task, model_type):
     """
     logging.info(f'Load model name:{model_type}')
     try:
-        if model_type in ['openai', 'azure']:
+        logging.info(f'Query:{input_txt}')
+        if model_type in ['open_ai', 'azure']:
             gpt = load_model(model_type)
             response, token_num = gpt.get_top_reply(input_txt, task, context='', model_type=model_type)
-            logging.info(f"text len:{len(input_txt)}. Consumer token num:{token_num}")
+            logging.info(f"text len:{len(input_txt)}. Consumer token num:{token_num}. Response:{response}")
             return response
         elif model_type == 'all':
             gpt = load_model("azure")
@@ -193,12 +199,12 @@ with gr.Blocks(css="footer {visibility: hidden}", title='ChatLLM is all you need
         with gr.Row():
             with gr.Column():
                 input_text = gr.Textbox(label="我要提问", value="介绍下自己？")
-                model_type = gr.Dropdown(choices=["memect", "openai", "azure", "all"], value='memect', label='选择模型类型')
+                model_type = gr.Dropdown(choices=["memect", "open_ai", "azure", "all"], value='memect', label='选择模型类型')
                 task_type = gr.Radio(choices=list(prompt_text.keys()),
                                      label="场景类型", value='问答')
                 submit = gr.Button("问一下")
             with gr.Column():
-                output_ret = gr.Text(label='输出')
+                output_ret = gr.Text(label='输出', lines=8)
         submit.click(fn=task_with_chat, inputs=[input_text, task_type, model_type], outputs=output_ret)
         gr.Examples(example, [input_text, task_type])
 
@@ -218,7 +224,7 @@ with gr.Blocks(css="footer {visibility: hidden}", title='ChatLLM is all you need
 
         chatbot = gr.Chatbot([("Welcome MemChatDoc. Please upload doc.", None)], show_label=False,
                              elem_id='chatbot').style(height="100%")
-        model_type = gr.Dropdown(choices=["memect", "openai", "azure"], value='memect', label='选择模型类型')
+        model_type = gr.Dropdown(choices=["memect", "open_ai", "azure"], value='memect', label='选择模型类型')
         state = gr.State([])
         with gr.Row():
             with gr.Column(scale=0.85):

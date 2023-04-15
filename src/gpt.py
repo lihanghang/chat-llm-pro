@@ -146,7 +146,7 @@ class GPT:
         """Calls the OpenAI API with the specified parameters.
         """
         response = openai.ChatCompletion.create(engine=self.get_engine() if model_type == 'azure' else None,
-                                                model=self.get_engine() if model_type == 'openai' else None,
+                                                model=self.get_engine() if model_type == 'open_ai' else None,
                                                 messages=self.get_query_message(self.generate_prompt(text, task_type),
                                                                                 context=context),
                                                 max_tokens=self.get_max_tokens(),
