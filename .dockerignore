@@ -5,3 +5,4 @@ docs
 notebook
 .gitignore
 .git
+.DS_STORE

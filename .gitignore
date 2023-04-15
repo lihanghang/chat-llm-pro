@@ -15,5 +15,5 @@ build/
 .DS_STORE
 
 .env
-docs/test_pdf
+docs
 venv
