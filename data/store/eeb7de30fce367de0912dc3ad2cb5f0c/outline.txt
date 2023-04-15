@@ -1,0 +1,25 @@
+[1,1,1][True]简历
+    [2,1,1][False]1.熟悉软件生命周期，了解敏捷开发，熟悉软件工程，具有良好的文档编写能力
+    [2,1,1][False]2.积极主动，擅长沟通，责任心强，乐于分享，能够快速适应新环境，融入新团队
+    [2,1,1][False]3.善于总结与复盘，在CSDN连载原创博客5年多，文章数量240+篇，博客地址：https://mindartisan.blog.csdn.net/
+    [2,1,1][False]4.具有一定的英语能力，经常查阅英文官网技术文档，常常通过Stack Overflow以及GitHub解决问题
+    [2,1,1][False]5.学习能力较强，经常在极客时间、慕课网学习，并经常浏览博客园、SegmentFault等优秀网站和技术社区，在职期间考取了软件设计师中级职称
+        [3,1,1][False]1.熟悉Java集合类源码
+        [3,1,1][False]2.熟练使用Spring、SpringMVC、Spring Boot、MyBatis、MyBatis-Plus、Spring Cloud等开发框架
+        [3,1,1][False]3.熟练使用MySQL，SQLServer等关系型数据库，熟悉MySQL索引、事务，语句调优
+        [3,1,1][False]4.熟悉Java多线程，熟悉synchronize、volatile、AQS
+        [3,1,2][False]5.熟练使用Redis非关系型数据库，熟悉其过期策略、持久化、内存淘汰机制等
+        [3,1,2][False]6.熟悉RabbitMQ消息中间件、Mycat数据库中间件
+        [3,1,2][False]7.对JVM有初步了解，如类加载机制、内存模型、垃圾回收等
+        [3,1,2][False]8.熟悉常用设计模式，如单例模式、工厂模式、代理模式等
+        [3,1,2][False]9.熟悉常用算法及思想，如快速排序、冒泡排序
+        [3,1,2][False]10.熟悉Nginx反向代理、负载均衡
+        [3,1,2][False]11.熟悉Linux常用命令
+        [3,1,2][False]12.熟练使用Git代码管理工具
+        [3,1,2][False]13.熟悉以Jenkins为核心的持续构建环境的搭建和使用
+        [3,1,2][False]14.熟练使用Confluence、Coding、禅道、Rational Rose等项目管理工具和建模工具项目经历
+            [4,1,2][False]1.旺店通跨境ERP
+            [4,1,3][False]2.智慧供应链
+            [4,1,3][False]3.PCP
+            [4,1,4][False]4.福道云绩效系统
+            [4,1,5][False]5.卓脑

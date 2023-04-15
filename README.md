@@ -2,7 +2,7 @@
 > 从2022年下半年到2023，Chatgpt显得低调且惊艳，本项目主要基于各类语言模型coding NLP相关应用。
 
 ## 流程图
-![pipeline](docs/pipeline.png)
+![pipeline](images/pipeline.png)
 
 ##  run env
 ```shell
@@ -19,8 +19,8 @@ $ docker-compose build
 
 ## Web UI
 
-![task_example](docs/task_demo.png)
-![add_example](docs/add_example.png)
+![task_example](images/task_demo.png)
+![add_example](images/add_example.png)
 
 
 ## 日志

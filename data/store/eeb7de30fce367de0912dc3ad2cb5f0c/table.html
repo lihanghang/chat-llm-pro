@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+
+    <!-- 为了避免需要打包很多内容，使用外网连接，不过在内网就不方便使用了 -->
+
+    <script src="https://unpkg.com/vue@3.2.1/dist/vue.global.prod.js"></script>
+    <!-- element plus 总是使用最新的版本？ -->
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+    <script src="https://unpkg.com/element-plus/dist/index.full.js"></script>
+    <style>
+        html,
+        body {
+            padding: 0px;
+            border: none;
+            margin: 0px;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        #app {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            /*background-color: antiquewhite;*/
+            /*border: 2px solid black;*/
+
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            grid-template-rows: 1fr;
+        }
+
+        #sidebar {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            box-sizing: border-box;
+            /*border: 2px solid khaki;*/
+
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
+
+        }
+
+        #sidebar-toolbar {
+            width: 100%;
+            height: auto;
+            box-sizing: border-box;
+            padding: 5px;
+            background-color: #D5D8DC;
+            display: flex;
+            /*border: 2px solid snow;*/
+        }
+
+        #outline {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            box-sizing: border-box;
+            /*border: 2px solid blue;*/
+        }
+
+        #viewer {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            box-sizing: border-box;
+            /*border: 2px solid yellow;*/
+            background-color: #EAECEE;
+        }
+
+        #viewer-header {
+            height: 20px;
+            /*background-color: brown;*/
+        }
+
+        #viewer-footer {
+            height: 20px;
+            /*background-color: black;*/
+        }
+
+        #viewer-body {
+            display: grid;
+            grid-template-columns: auto;
+            justify-items: center;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+        }
+
+        .doc {
+            /*background-color: gray;*/
+            display: grid;
+            grid-template-columns: auto;
+            justify-items: center;
+            row-gap: 10px;
+        }
+
+        .page-wrapper {
+            /*border: 1px solid #cccccc;*/
+        }
+
+
+        .page {
+            background-color: #ffffff;
+            /*border: 1px solid gray;*/
+            position: relative;
+            box-sizing: content-box;
+            overflow: hidden;
+        }
+
+        .page-pdf {}
+
+        .page-block .background{
+            display: none;
+        }
+        .page-background .block{
+            display: none;
+        }
+
+        .hide-table .table{
+            display: none;
+        }
+        .hide-figure .figure{
+            display: none;
+        }
+
+        .page-ocr {
+            border-radius: 16px;
+        }
+
+        .background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .background span {
+            color: #D5D8DC;
+        }
+
+        .background img{
+            opacity: 0.3;
+        }
+
+        .header {
+            position: absolute;
+            box-sizing: border-box;
+            border: 2px solid transparent;
+            z-index: 1;
+        }
+
+        .footer {
+            position: absolute;
+            box-sizing: border-box;
+            border: 2px solid transparent;
+            z-index: 1;
+        }
+
+        .header-hover {
+            border-color: salmon;
+        }
+
+        .footer-hover {
+            border-color: salmon;
+        }
+
+        .footnote {
+            position: absolute;
+            box-sizing: border-box;
+            border: 2px solid transparent;
+        }
+
+        .footnote-hover {
+            border-color: #D5D8DC;
+        }
+
+        .block {
+            position: absolute;
+            box-sizing: border-box;
+            border: 2px dashed moccasin;
+        }
+
+        .block-hover {
+            border-style: solid;
+        }
+        .sidebar{
+            position: absolute;
+            box-sizing: border-box;
+            background-color:crimson;
+        }
+
+        .span {
+            position: absolute;
+            display: block;
+            white-space: pre;
+            word-break: keep-all;
+            line-height: 1em;
+            color: #000000;
+        }
+
+        .span-overflow-cell-left {
+            background-color: indianred;
+        }
+
+        .span-overflow-cell-right {
+            background-color: #ffff00;
+        }
+
+        .supscript{
+            background-color: red;
+            color: white;
+            padding: 2px;
+        }
+        .subscript{
+            background-color: blue;
+            color: white;
+            padding: 2px;
+        }
+
+        .line {
+            position: absolute;
+            background-color: black;
+            min-width: 1px;
+            min-height: 1px;
+        }
+
+        .table {
+            position: absolute;
+            border: 2px solid black;
+            border-collapse: collapse;
+            /*使用content-box可以完整显示内容，但是会大4px，使用border-box，靠近边界的内容可能被覆盖*/
+            box-sizing: border-box;
+
+        }
+
+        .table-ybk.table-hover {
+            border: 2px solid salmon;
+        }
+
+        .table-wbk.table-hover {
+            border: 2px dashed salmon;
+        }
+
+        .table-ybk {}
+
+
+
+        .table-ybk td {
+            border: 1px solid black;
+            box-sizing: border-box;
+        }
+
+        .table-no-v-edges {
+            /*没有左右垂直线的表格*/
+            background-color: #D5D8DC;
+        }
+
+        .table-merged {
+            /*合并没有左右垂直线后的表格*/
+            background-color: antiquewhite;
+        }
+
+        .table-simple-merged {
+            /*合并没有左右垂直线的表格，但是没有合并其他内容，只是标记合并了*/
+            background-color: #EAECEE;
+        }
+
+        .table-wbk {}
+
+        .table-wbk td {
+            border: 1px dashed black;
+            box-sizing: border-box;
+        }
+
+        .figure {
+            display: block;
+            position: absolute;
+            box-sizing: content-box;
+            border: 1px solid transparent;
+        }
+
+        .figure:hover {
+            border: 1px solid salmon;
+        }
+
+        .adjust-line {
+            position: absolute;
+            background-color: #ffff00;
+            box-sizing: border-box;
+        }
+
+        .title {
+            position: absolute;
+            box-sizing: border-box;
+            border: 1px solid seagreen;
+            background-color: #D5D8DC;
+        }
+
+        .section {
+            position: absolute;
+            box-sizing: border-box;
+            border: 1px solid seagreen;
+        }
+
+        .annot-highlight {
+            position: absolute;
+            background-color: lightskyblue;
+            /*opacity: 0.5;*/
+        }
+
+        #copy-layer {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            /*width: 0px;*/
+            /*height: 0px;*/
+            overflow: hidden;
+            box-sizing: border-box;
+            opacity: 0;
+        }
+
+        /*为了支持水平滚动*/
+        .el-tree>.el-tree-node {
+            width: fit-content;
+        }
+        .help-table td {
+            vertical-align: top;
+        }
+        .info-table td{
+            vertical-align: top;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="copy-layer"></div>
+    <div id="app">
+        <div id="sidebar">
+            <div id="sidebar-toolbar">
+                <el-select v-model="doc.currentPageNumber" placeholder="请选择页码" style="width: 80px;" size="mini"
+                    @change="onChangePageNumber">
+                    <el-option v-for="page in doc.pages" :key="page.number" :label="page.number" :value="page.number">
+                    </el-option>
+                </el-select>
+                <el-select v-model="mode" size="mini" @change="onChangeMode" style="width:80px;">
+                    <el-option v-for="mode in modes" :key="mode" :label="mode" :value="mode"></el-option>
+                </el-select>
+                <div style="margin-left:auto;"></div>
+                <el-link icon="el-icon-info" @click.prevent="onInfo" class="info-button">信息</el-link>
+                <el-link icon="el-icon-help" @click.prevent="onHelp" class="help-button">说明</el-link>
+            </div>
+
+            <div id="outline">
+                <el-tree :data="outline.data" :props="outline.props" @node-click="onNodeClick">
+                </el-tree>
+            </div>
+        </div>
+        <div id="viewer">
+            <div id="viewer-header"></div>
+            <div id="viewer-body"><div class="doc"><div class="page-wrapper" style="width:612.00px;height:792.00px;"><div class="page page-pdf" style="display:none;width:612.00px;height:792.00px;" data-number="1"><div class="background" style="left:0.00px;top:0.00px;width:612.00px;height:792.00px;" title="background"></div><div class="header" style="left:0.00px;top:0.00px;width:612.00px;height:55.00px;" title="header"><div class="line" style="left:70.00px;top:53.00px;width:471.00px;height:0.00px;"></div><span class="span" style="left:309.00px;top:8.00px;font-size:9.00px;" data-width="253.0" data-rotate="0">0610b0618a22e2171n1_3d-4GFpWxJG-UP2XReyinPQ~</span><span class="span" style="left:504.00px;top:43.00px;font-size:9.00px;" data-width="36.0" data-rotate="0">个人简历</span></div><div class="block" style="left:0.00px;top:55.00px;width:612.00px;height:686.00px;" data-number="1" title="block-1"></div><div class="footer" style="left:0.00px;top:741.00px;width:612.00px;height:51.00px;" title="footer"><span class="span" style="left:281.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">第</span><span class="span" style="left:295.00px;top:-1.00px;font-size:9.00px;font-weight:bold;" data-width="4.0" data-rotate="0">1</span><span class="span" style="left:304.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">页</span><span class="span" style="left:317.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">共</span><span class="span" style="left:331.00px;top:-1.00px;font-size:9.00px;font-weight:bold;" data-width="4.0" data-rotate="0">5</span><span class="span" style="left:340.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">页</span></div></div></div><div class="page-wrapper" style="width:612.00px;height:792.00px;"><div class="page page-pdf" style="display:none;width:612.00px;height:792.00px;" data-number="2"><div class="background" style="left:0.00px;top:0.00px;width:612.00px;height:792.00px;" title="background"></div><div class="header" style="left:0.00px;top:0.00px;width:612.00px;height:55.00px;" title="header"><div class="line" style="left:70.00px;top:53.00px;width:471.00px;height:0.00px;"></div><span class="span" style="left:504.00px;top:43.00px;font-size:9.00px;" data-width="36.0" data-rotate="0">个人简历</span></div><div class="block" style="left:0.00px;top:55.00px;width:612.00px;height:686.00px;" data-number="1" title="block-1"></div><div class="footer" style="left:0.00px;top:741.00px;width:612.00px;height:51.00px;" title="footer"><span class="span" style="left:281.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">第</span><span class="span" style="left:295.00px;top:-1.00px;font-size:9.00px;font-weight:bold;" data-width="4.0" data-rotate="0">2</span><span class="span" style="left:304.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">页</span><span class="span" style="left:317.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">共</span><span class="span" style="left:331.00px;top:-1.00px;font-size:9.00px;font-weight:bold;" data-width="4.0" data-rotate="0">5</span><span class="span" style="left:340.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">页</span></div></div></div><div class="page-wrapper" style="width:612.00px;height:792.00px;"><div class="page page-pdf" style="display:none;width:612.00px;height:792.00px;" data-number="3"><div class="background" style="left:0.00px;top:0.00px;width:612.00px;height:792.00px;" title="background"></div><div class="header" style="left:0.00px;top:0.00px;width:612.00px;height:55.00px;" title="header"><div class="line" style="left:70.00px;top:53.00px;width:471.00px;height:0.00px;"></div><span class="span" style="left:504.00px;top:43.00px;font-size:9.00px;" data-width="36.0" data-rotate="0">个人简历</span></div><div class="block" style="left:0.00px;top:55.00px;width:612.00px;height:686.00px;" data-number="1" title="block-1"></div><div class="footer" style="left:0.00px;top:741.00px;width:612.00px;height:51.00px;" title="footer"><span class="span" style="left:281.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">第</span><span class="span" style="left:295.00px;top:-1.00px;font-size:9.00px;font-weight:bold;" data-width="4.0" data-rotate="0">3</span><span class="span" style="left:304.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">页</span><span class="span" style="left:317.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">共</span><span class="span" style="left:331.00px;top:-1.00px;font-size:9.00px;font-weight:bold;" data-width="4.0" data-rotate="0">5</span><span class="span" style="left:340.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">页</span></div></div></div><div class="page-wrapper" style="width:612.00px;height:792.00px;"><div class="page page-pdf" style="display:none;width:612.00px;height:792.00px;" data-number="4"><div class="background" style="left:0.00px;top:0.00px;width:612.00px;height:792.00px;" title="background"></div><div class="header" style="left:0.00px;top:0.00px;width:612.00px;height:55.00px;" title="header"><div class="line" style="left:70.00px;top:53.00px;width:471.00px;height:0.00px;"></div><span class="span" style="left:504.00px;top:43.00px;font-size:9.00px;" data-width="36.0" data-rotate="0">个人简历</span></div><div class="block" style="left:0.00px;top:55.00px;width:612.00px;height:686.00px;" data-number="1" title="block-1"></div><div class="footer" style="left:0.00px;top:741.00px;width:612.00px;height:51.00px;" title="footer"><span class="span" style="left:281.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">第</span><span class="span" style="left:295.00px;top:-1.00px;font-size:9.00px;font-weight:bold;" data-width="4.0" data-rotate="0">4</span><span class="span" style="left:304.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">页</span><span class="span" style="left:317.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">共</span><span class="span" style="left:331.00px;top:-1.00px;font-size:9.00px;font-weight:bold;" data-width="4.0" data-rotate="0">5</span><span class="span" style="left:340.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">页</span></div></div></div><div class="page-wrapper" style="width:612.00px;height:792.00px;"><div class="page page-pdf" style="display:none;width:612.00px;height:792.00px;" data-number="5"><div class="background" style="left:0.00px;top:0.00px;width:612.00px;height:792.00px;" title="background"></div><div class="header" style="left:0.00px;top:0.00px;width:612.00px;height:55.00px;" title="header"><div class="line" style="left:70.00px;top:53.00px;width:471.00px;height:0.00px;"></div><span class="span" style="left:504.00px;top:43.00px;font-size:9.00px;" data-width="36.0" data-rotate="0">个人简历</span></div><div class="block" style="left:0.00px;top:55.00px;width:612.00px;height:686.00px;" data-number="1" title="block-1"></div><div class="footer" style="left:0.00px;top:741.00px;width:612.00px;height:51.00px;" title="footer"><span class="span" style="left:281.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">第</span><span class="span" style="left:295.00px;top:-1.00px;font-size:9.00px;font-weight:bold;" data-width="4.0" data-rotate="0">5</span><span class="span" style="left:304.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">页</span><span class="span" style="left:317.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">共</span><span class="span" style="left:331.00px;top:-1.00px;font-size:9.00px;font-weight:bold;" data-width="4.0" data-rotate="0">5</span><span class="span" style="left:340.00px;top:-1.00px;font-size:9.00px;" data-width="9.0" data-rotate="0">页</span></div></div></div></div></div>
+            <div id="viewer-footer"></div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+        const outlineData = [{"id": "table-root", "title": "表格", "children": []}];
+        const doc = {"currentPageNumber": 1, "pages": [{"number": 1}, {"number": 2}, {"number": 3}, {"number": 4}, {"number": 5}], "pdf_info": {"title": "", "producer": "Microsoft® Word LTSC; modified using iText® 5.5.13 ©2000-2018 iText Group NV (AGPL-version) (AGPL-version)", "creator": "Microsoft® Word LTSC", "author": "郑 璐璐", "subject": "", "keywords": "0610b0618a22e2171n1_3d-4GFpWxJG-UP2XReyinPQ~", "source": null}};
+        let root = null;
+        if (typeof Vue === 'undefined' || typeof ElementPlus === 'undefined') {
+            alert('网络存在问题，不能够下载依赖的js/css文件');
+        } else {
+            const app = Vue.createApp({
+                //el:'#app',
+                data: () => {
+                    return {
+                        modes:[
+                            'all',
+                            'block',
+                            'background',
+                            'hideTable',
+                            'hideFigure'
+                        ],
+                        mode:'all',
+                        outline: {
+                            data: outlineData,
+                            props: {
+                                label: 'title',
+                                children: 'children'
+                            },
+                            style: {
+                                'min-height': '100%'
+                            }
+                        },
+                        doc: doc
+                    }
+                },
+                watch: {
+
+                },
+                methods: {
+                    onNodeClick(data, node, comp) {
+                        const id = data.id;
+                        const el = document.getElementById(id);
+                        //console.log('===>click',data,id,el);
+                        if (el) {
+                            gotoElement(el);
+                        } else if (typeof data.page_number == 'number' && data.page_number >= 1) {
+                            //如果没有元素，如：虚拟标题，直接到页面即可
+                            showPage(data.page_number, true)
+                        }
+
+                    },
+                    onChangePageNumber(n) {
+                        //仅仅在选择改变的时候触发，改变v-model的值不会
+                        //所以显示页面且滚动到
+                        showPage(n, true);
+                    },
+                    onChangeMode(mode){
+                        //console.log('mode',mode)
+                        const els = document.querySelectorAll('.page');
+                        for(const el of els){
+                            el.classList.toggle('page-background',mode=='background')
+                            el.classList.toggle('page-block',mode=='block')
+                            el.classList.toggle('hide-table',mode=='hideTable')
+                            el.classList.toggle('hide-figure',mode==='hideFigure')
+                        }
+                        
+                    },
+                    onHelp(event) {
+                        const html = `
+                    <table class="help-table">
+                    <colgroup><col style="width:80px;"/><col/></colgroup>
+                    <tr><td>表格节点：</td><td>[page_number,block_index]</td></tr>
+                    <tr><td>复制表格：</td><td>在页面上的表格双击</td></tr>
+                    <tr><td>表格图片：</td><td>alt+表格单击</td></tr>
+                    </table>
+                    `;
+                        this.$alert(html, '说明', {
+                            showClose: false,
+                            dangerouslyUseHTMLString: true,
+                            confirmButtonText: '关闭'
+                        });
+                    },
+                    onInfo(event) {
+                        const pdfInfo = this.doc['pdf_info'] || {};
+                        function escapeHtml(s) {
+                            s = s || ''
+                            return s.replace(/&/g, "&amp;")
+                                .replace(/</g, "&lt;")
+                                .replace(/>/g, "&gt;")
+                                .replace(/"/g, "&quot;")
+                                .replace(/'/g, "&#039;");
+                        }
+                        const html = `
+                    <table class="info-table">
+                    <colgroup><col style="width:80px;"/><col/></colgroup>
+                    <tr><td>title:</td><td>${escapeHtml(pdfInfo.title)}</td></tr>
+                    <tr><td>producer:</td><td>${escapeHtml(pdfInfo.producer)}</td></tr>
+                    <tr><td>creator:</td><td>${escapeHtml(pdfInfo.creator)}</td></tr>
+                    <tr><td>source:</td><td>${escapeHtml(pdfInfo.source)}</td></tr>
+                    </table>
+                    `;
+                        this.$alert(html, 'INFO', {
+                            showClose: false,
+                            dangerouslyUseHTMLString: true,
+                            confirmButtonText: '关闭'
+                        });
+                    }
+
+                }
+
+            });
+            //app.use(antd);
+            app.use(ElementPlus);
+            //or #app
+            root = app.mount('#sidebar');
+        }
+
+
+
+
+    </script>
+
+    <script type="text/javascript">
+
+        function changeBackground(event) {
+            //console.log(event);
+            const value = event.target.value;
+            console.log(value);
+            document.body.style.backgroundColor = value;
+        }
+        function changePageColor(event) {
+            const value = event.target.value;
+            console.log(value);
+            for (const el of document.querySelectorAll('.page')) {
+                el.style.backgroundColor = value;
+            }
+        }
+        function changeFontColor(event) {
+            const value = event.target.value;
+            console.log(value);
+            for (const el of document.querySelectorAll('.span')) {
+                el.style.color = value;
+            }
+        }
+
+        function doCopyTable(event) {
+            const el = event.target.closest('.table');
+            if (el) {
+                copyTable(el)
+            }
+        }
+        function copyTable(table) {
+            //table is Element
+            const selection = document.getSelection();
+            const range = document.createRange();
+            range.selectNode(table);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            document.execCommand('copy');
+
+        }
+
+        function copyTables(table) {
+            //table is {}
+            const rows = [];
+            for (const cell of table.cells) {
+                //创建一个新的表格
+                let row = null;
+                if (cell.row_index < rows.length) {
+                    row = rows[cell.row_index];
+                } else {
+                    row = [];
+                    rows.push(row);
+                }
+                row.push(cell);
+            }
+            const tableEl = document.createElement("table");
+            for (const row of rows) {
+                const tr = document.createElement("tr");
+                for (const c of row) {
+                    const td = document.createElement("td");
+                    td.setAttribute("rowspan", c.row_span);
+                    td.setAttribute("colspan", c.col_span);
+                    //直接设置记得使用大小写
+                    //td.rowSpan = c.row_span
+                    //td.colSpan = c.col_span
+                    td.textContent = c.text;
+                    //TODO 支持图片
+                    if (c.figures) {
+                        for (const f of c.figures) {
+                            //<img src="images/${}"/>
+                            const imgEl = document.createElement('img');
+                            imgEl.src = `images/${f.filename}`;
+                            td.append(imgEl);
+                        }
+                    }
+                    tr.append(td);
+                }
+                tableEl.append(tr);
+            }
+
+            //不能够设置为style.display='none';
+            //tableEl.style.visibility='hidden';
+            tableEl.classList.add("table", "table-ybk");
+
+            //document.body.append(tableEl);
+            //先清除之前的
+            const debug = false;
+            document.getElementById("copy-layer").innerHTML = "";
+            document.getElementById("copy-layer").append(tableEl);
+            copyTable(tableEl);
+            //可以删除，debug的可以保留，因为下一次会清除，innerHTML=''
+            if (!debug) {
+                tableEl.parentElement.removeChild(tableEl);
+            }
+        }
+        function showPage(number, scroll = false) {
+            const el = document.querySelector(`.page[data-number="${number}"]`);
+            el.style.display = 'block';
+            if (scroll) {
+                el.scrollIntoView();
+            }
+        }
+
+        function gotoElement(el) {
+            //因为采用按需显示，就需要先设置display:block
+            const page = el.closest('.page');
+            page.style.display = 'block';
+            el.scrollIntoView({ inline: 'nearest', block: 'start' });
+        }
+
+        let pressedKeys={}
+        function onKeyDown(event){
+            pressedKeys[event.keyCode]=true;
+        }
+        function onKeyUp(event){
+            //console.log(event);
+            //如果在其他窗口释放，就不能够获得该事件了
+            //忽略大小写的
+            pressedKeys[event.keyCode]=false;
+            //console.log(pressedKeys)
+        }
+        function onClick(event){
+            const el = event.target.closest('.table');
+            if (el) {
+                //console.log(pressedKeys)
+                //81 => q or Q
+                if(pressedKeys[81] && el.dataset.screenshotFilename){
+                    window.open(`images/${el.dataset.screenshotFilename}`,'_blank')
+                }else if(pressedKeys[65] && el.dataset.masterScreenshotFilename){
+                    //65 => a or A
+                    window.open(`images/${el.dataset.masterScreenshotFilename}`,'_blank')
+                }else{
+                }
+                
+                pressedKeys={}
+            }
+        }
+
+        function initEvents() {
+            document.addEventListener('dblclick', doCopyTable);
+            document.addEventListener('click',onClick)
+            document.addEventListener('keydown',onKeyDown)
+            document.addEventListener('keyup',onKeyUp)
+        }
+        function initTables() {
+            for (const el of document.querySelectorAll('.table')) {
+
+                el.addEventListener('mouseenter', () => {
+                    el.classList.add('table-hover');
+                });
+                el.addEventListener('mouseleave', () => {
+                    el.classList.remove('table-hover');
+                });
+            }
+        }
+
+        function initBlocks() {
+            for (const el of document.querySelectorAll('.block')) {
+                el.addEventListener('mouseenter', () => {
+                    el.classList.add('block-hover');
+                    //document.getElementById('mouse-block-number').innerHTML = el.dataset["number"];
+                });
+                el.addEventListener('mouseleave', () => {
+                    el.classList.remove('block-hover');
+                    //document.getElementById('mouse-block-number').innerHTML = '';
+                });
+            }
+        }
+
+        function initPages() {
+            for (const el of document.querySelectorAll('.page')) {
+                el.addEventListener('mouseenter', () => {
+                    //console.log(el,el.dataset);
+                    //document.getElementById('mouse-page-number').innerHTML = el.dataset["number"];
+                });
+                el.addEventListener('mouseleave', () => {
+                    //document.getElementById('mouse-page-number').innerHTML = '';
+                });
+            }
+            const hovers = [
+                ['.header', 'header-hover', 'header'],
+                ['.footer', 'footer-hover', 'footer'],
+                ['.footnote', 'footnote-hover', 'footnote']
+            ]
+            for (const hover of hovers) {
+                for (const el of document.querySelectorAll(hover[0])) {
+                    el.addEventListener('mouseenter', () => {
+                        el.classList.add(hover[1])
+                        //el.title=hover[2]
+                    });
+                    el.addEventListener('mouseleave', () => {
+                        el.classList.remove(hover[1])
+                    });
+                }
+            }
+
+
+            updateFont('sans-serif');
+
+        }
+        function setupObserver() {
+            const options = {
+                //chrome>=81
+                root: null,//document.body,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+            const callback = (entries, observer) => {
+                entries.forEach(entry => {
+                    //console.log('xxx',entry)
+                    if (entry.isIntersecting) {
+                        const el = entry.target.querySelector('.page')
+                        el.style.display = 'block';
+                    }
+                    // Each entry describes an intersection change for one observed
+                    // target element:
+                    //   entry.boundingClientRect
+                    //   entry.intersectionRatio
+                    //   entry.intersectionRect
+                    //   entry.isIntersecting
+                    //   entry.rootBounds
+                    //   entry.target
+                    //   entry.time
+                });
+            };
+
+            const observer = new IntersectionObserver(callback, options);
+            for (let page of document.querySelectorAll('.page-wrapper')) {
+                observer.observe(page);
+            }
+        }
+        function updateFont(family) {
+            const ctx = document.createElement('canvas').getContext('2d');
+            for (const el of document.querySelectorAll('.span')) {
+                //需要在这里计算
+                const text = el.textContent;
+                //const width = parseInt(el.dataset.width);
+                const width = parseInt(el.dataset.width);
+                const rotate = parseInt(el.dataset.rotate);
+
+                ctx.font = `${el.style.fontSize} ${family}`;
+
+                const w1 = ctx.measureText(text).width;
+
+                el.style.fontFamily = family;
+                //console.log(`${el.style.fontSize} ${family},${w1},${width}`);
+                if (w1 > 0 && width > 0) {
+                    //如果有旋转的，就不需要0% 0%
+                    if (rotate != 0) {
+                        el.style.transformOrigin = '';
+                        el.style.transform = `scale(${width / w1}) rotate(${rotate}deg)`;
+                    } else {
+                        el.style.transformOrigin = '0% 0%';
+                        el.style.transform = `scaleX(${width / w1})`;
+                    }
+
+
+                }
+
+            }
+        }
+
+
+
+        function getVisiblePages(el) {
+            function hasOverlap(a, b) {
+                //判断a和b是否有重叠（相交）
+                if (a[2] <= b[0] || a[0] >= b[2] || a[1] >= b[3] || a[3] <= b[1]) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+            const visibleRect = [
+                el.scrollLeft + el.offsetLeft,
+                el.scrollTop + el.offsetTop,
+                el.scrollLeft + el.offsetLeft + el.clientWidth,
+                el.scrollTop + el.offsetTop + el.clientHeight
+            ];
+            //找到当前可见区域最大的页面，就认为是当前的页面
+
+            const visiblePages = [];
+            const pages = document.querySelectorAll('.page-wrapper');
+            for (let page of pages) {
+                //获得page在可见区域的坐标，原点为viewer的左上角
+                const rect = [
+                    page.offsetLeft + page.clientLeft,
+                    page.offsetTop + page.clientTop,
+                    page.offsetLeft + page.clientLeft + page.clientWidth,
+                    page.offsetTop + page.clientTop + page.clientHeight
+                ]
+                if (hasOverlap(rect, visibleRect)) {
+                    const area = page.clientWidth * page.clientHeight;
+                    const x0 = Math.max(rect[0], visibleRect[0]);
+                    const x1 = Math.min(rect[2], visibleRect[2]);
+                    const y0 = Math.max(rect[1], visibleRect[1]);
+                    const y1 = Math.min(rect[3], visibleRect[3]);
+                    const overlapArea = (x1 - x0) * (y1 - y0);
+                    //精确到.01即可
+                    const percent = parseInt(overlapArea / area * 100);
+                    visiblePages.push({
+                        el: page.querySelector('.page'),
+                        number: parseInt(page.querySelector('.page').dataset.number),
+                        percent: percent
+                    });
+                }
+            }
+
+            visiblePages.sort((a, b) => {
+                //放宽比较，如：0.8345 == 0.8365
+                const p1 = a.percent;
+                const p2 = b.percent;
+                if (p1 === p2) {
+                    return a.number - b.number;
+                } else {
+                    //大的排前面
+                    return p2 - p1;
+                }
+            });
+            //日志的时候需要复制一个，否则后面会添加新的页面到这个对象中
+            return visiblePages
+        }
+
+        initBlocks();
+        initTables();
+        initPages();
+        initEvents();
+
+        setupObserver()
+
+        document.getElementById('viewer').addEventListener('scroll', () => {
+            const visiblePages = getVisiblePages(document.getElementById('viewer'));
+            for (const page of visiblePages) {
+                //仅仅显示页面
+                page.el.style.display = 'block';
+            }
+            if (visiblePages.length > 0 && root !== null) {
+                root.doc.currentPageNumber = visiblePages[0].number;
+            }
+        });
+
+
+
+    </script>
+</body>
+
+</html>
