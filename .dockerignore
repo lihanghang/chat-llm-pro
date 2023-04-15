@@ -2,6 +2,6 @@ tests
 venv
 scripts
 docs
-exampls
+notebook
 .gitignore
 .git

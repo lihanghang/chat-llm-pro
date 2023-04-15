@@ -6,13 +6,11 @@
 # python>=3.8
 virtualenv -p python venv
 source venv/bin/activate
-
 ```
 ## 编译镜像
 
 ```shell
 $ docker-compose build
-
 ```
 
 ## Web UI
@@ -21,7 +19,7 @@ $ docker-compose build
 ![add_example](docs/add_example.png)
 
 
-## 其他
+## 日志
 ### 局限
 1. 调参能力有限。响应结果的干预手段有限
 2. 需要走第三方网络请求，稳定性不强，如何内网部署使用

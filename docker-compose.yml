@@ -4,8 +4,8 @@ services:
     container_name: chat_llm
     build:
       context: ./
-      dockerfile: ./scripts/Dockerfile
-    image: chat_llm:0.0.1
+      dockerfile: ./Dockerfile
+    image: chat_llm:0.0.2
     env_file:
       - .env
     ports:

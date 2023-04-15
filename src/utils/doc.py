@@ -12,6 +12,7 @@ import logging
 
 from tqdm import tqdm
 
+from src.utils.embedding import get_embedding
 from web import api_server
 from src.utils.doc_enum import DocField
 
@@ -163,11 +164,6 @@ def create_embedding(file_name):
 
     """
     result = []
-
-    def get_embedding(input_slice):
-        embedding = openai.Embedding.create(engine="text-embedding-ada-002", input=input_slice)
-        return [(text, data.embedding) for text, data in zip(input_slice, embedding.data)], embedding.usage.total_tokens
-
     # TODO：解析doc.json 保留页码信息
     contents = read_file(file_name)
         

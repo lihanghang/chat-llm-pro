@@ -17,25 +17,36 @@ curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.insert(0, os.path.split(rootPath)[0])
 
+from src.utils.embedding import get_embedding
 from src.langchain.extract import parser_pdf, extract_doc, chat_mem_fin_llm
-from web import host, port, model_name, openai_key, api_version, api_base, api_type
+from web import host, port, office_model_name, office_openai_key, api_version, api_base, api_type, azure_model_name, azure_openai_key
 from data import example, prompt_text
 from src.gpt import set_openai_key, GPT, Example
 from src.utils.data_store import doc2embedding, save_embedding
 from src.utils.doc import parser_doc, hashcode_with_file, get_file_ext_size
 
-set_openai_key(openai_key)
-#
-# openai.api_base = api_base
-# openai.api_version = api_version
-# openai.api_type = api_type
 
-model_type = 'MemFinLLM'
+model_type = 'openai'
 data_store_base_path = 'data/store'  # 生成文件父级目录
 store_origin_file_dir = None
 mem_api_base = os.getenv('MEM_FIN_OPENAI_API')
 
-gpt = GPT(engine=model_name, temperature=0.6, max_tokens=1024)
+
+def load_model(model_type):
+    """
+    根据模型类型加载不同参数
+    """
+    if model_type == 'azure':
+        set_openai_key(azure_openai_key, api_version, api_base, api_type)
+        gpt = GPT(engine=azure_model_name, temperature=0.6, max_tokens=1024)
+        return gpt
+
+    elif model_type == 'openai':
+        set_openai_key(office_openai_key)
+        gpt = GPT(engine=office_model_name, temperature=0.6, max_tokens=1024)
+        return gpt
+    else:
+        logging.info(model_type)
 
 
 def init_store_dir(store_dir):
@@ -49,11 +60,6 @@ def init_store_dir(store_dir):
             dir_path = os.path.join(root, item)
             shutil.rmtree(dir_path)
     logging.info("Clean store data.")
-
-
-def get_embedding(query):
-    embedding = openai.Embedding.create(engine="text-embedding-ada-002", input=query)
-    return query, embedding.data[0].embedding, embedding.usage.total_tokens
 
 
 def process_upload_file(file_tmp_path):
@@ -84,7 +90,7 @@ def process_upload_file(file_tmp_path):
         copy_upload_file = f'{store_origin_file_dir}/{doc_name_with_ext}'
         shutil.copyfile(file_name_path, copy_upload_file)
         output_text_file = parser_doc(copy_upload_file, store_origin_file_dir)  # 统一解析输出为.txt
-        embedding_with_index: dict = doc2embedding(output_text_file)  # 转化为词向量
+        embedding_with_index: dict = doc2embedding(output_text_file)  # 根据openai或其他embedding服务将句子转化为词向量
         save_embedding(embedding_with_index, f'{store_origin_file_dir}/embedding.pickle')  # 存储至本地
 
     return f'{doc_name_with_ext}预处理完成。这篇文档主要讲了以下内容。'
@@ -100,11 +106,11 @@ def chat_doc(query, model_type, task_type='问答'):
         file = open(f'{store_origin_file_dir}/embedding.pickle', 'rb')
         emb_data = pickle.load(file)
         index, data = emb_data['index'], emb_data['embedding']
-        logging.info("Success load doc vector file.")
+        logging.info("Success load doc vector file. Start query embedding……")
 
-        text, emb, query_token_num = get_embedding(query)  # compute query embedding
+        emb, query_token_num = get_embedding(query)  # compute query embedding
         logging.info(f"query token num:{query_token_num}")
-        _, text_index = index.search(np.array([emb]), k=10)  # 根据索引从上传文档中搜索相近的内容
+        _, text_index = index.search(np.array([emb[0][1]]), k=10)  # 根据索引从上传文档中搜索相近的内容
         context = []
         for i in list(text_index[0]):
             context.extend(data[i:i + 6])
@@ -120,8 +126,9 @@ def chat_doc(query, model_type, task_type='问答'):
 
         text = "".join(text for _, text in enumerate(context))
         logging.info(f'Load model {model_type}')
-        if model_type == 'gpt35':
-            ret, tokens_num = gpt.get_top_reply(query, task_type, text)  # 请求LLM
+        if model_type in ['azure', 'openai']:
+            gpt = load_model(model_type)
+            ret, tokens_num = gpt.get_top_reply(query, task_type, text, model_type)  # 请求LLM
             logging.debug(f'Context:{text}\nOutput:{ret}')
             logging.info(f"本轮对话消耗tokens:{tokens_num}")
             return f'{model_type}\n{ret}'
@@ -135,10 +142,12 @@ def chat_doc(query, model_type, task_type='问答'):
 
 def add_examples(issue, reply):
     """Generate QA example"""
+    gpt = load_model(model_type)
     return gpt.add_example(Example(issue, reply))
 
 
 def del_all_examples():
+    gpt = load_model(model_type)
     [gpt.delete_example(ex_id) for ex_id, _ in gpt.get_all_examples().items()]
     return gpt.get_all_examples()
 
@@ -151,13 +160,15 @@ def task_with_chat(input_txt, task, model_type):
     """
     logging.info(f'Load model name:{model_type}')
     try:
-        if model_type == 'gpt35':
-            response, token_num = gpt.get_top_reply(input_txt, task)
+        if model_type in ['openai', 'azure']:
+            gpt = load_model(model_type)
+            response, token_num = gpt.get_top_reply(input_txt, task, context='', model_type=model_type)
             logging.info(f"text len:{len(input_txt)}. Consumer token num:{token_num}")
             return response
         elif model_type == 'all':
+            gpt = load_model("azure")
             mem_response = chat_mem_fin_llm(mem_api_base, input_txt, task)
-            gpt_response, token_num = gpt.get_top_reply(input_txt, task)
+            gpt_response, token_num = gpt.get_top_reply(input_txt, task,  context='', model_type='azure')
             return f'【MemectFinLLM】\n{mem_response} \n\n【gpt】\n{gpt_response}'
 
         else:
@@ -176,13 +187,13 @@ def extract_chain(file_path, schema, model_type):
 
 with gr.Blocks(css="footer {visibility: hidden}", title='ChatLLM is all you need') as demo:
     gr.Markdown(f"<h1 style='text-align: center;'>大语言模型应用体验</h1>")
-    gr.Markdown(f'> Model by {model_type}. Contact us via https://www.memect.cn/ .')
+    gr.Markdown(f'> Model by MemFinLLM. Contact us via https://www.memect.cn/ .')
 
     with gr.Tab("场景问答"):
         with gr.Row():
             with gr.Column():
                 input_text = gr.Textbox(label="我要提问", value="介绍下自己？")
-                model_type = gr.Dropdown(choices=["MemeFinLLM（文因金融大模型）", "gpt35", "all"], value='文因金融大模型', label='选择模型')
+                model_type = gr.Dropdown(choices=["memect", "openai", "azure", "all"], value='memect', label='选择模型类型')
                 task_type = gr.Radio(choices=list(prompt_text.keys()),
                                      label="场景类型", value='问答')
                 submit = gr.Button("问一下")
@@ -196,11 +207,9 @@ with gr.Blocks(css="footer {visibility: hidden}", title='ChatLLM is all you need
             history = history + [(process_upload_file(doc), None)]
             return history
 
-
         def add_text(history, inp):
             history = history + [(inp, None)]
             return history, ""
-
 
         def bot(history, model_type):
             history[-1][1] = chat_doc(query=history[-1][0], model_type=model_type)
@@ -209,8 +218,7 @@ with gr.Blocks(css="footer {visibility: hidden}", title='ChatLLM is all you need
 
         chatbot = gr.Chatbot([("Welcome MemChatDoc. Please upload doc.", None)], show_label=False,
                              elem_id='chatbot').style(height="100%")
-        model_type = gr.Dropdown(choices=["MemeFinLLM（文因金融大模型）", "gpt35"], value='文因金融大模型',
-                                 label='选择模型')
+        model_type = gr.Dropdown(choices=["memect", "openai", "azure"], value='memect', label='选择模型类型')
         state = gr.State([])
         with gr.Row():
             with gr.Column(scale=0.85):
@@ -251,3 +259,4 @@ with gr.Blocks(css="footer {visibility: hidden}", title='ChatLLM is all you need
 
 init_store_dir(data_store_base_path)
 demo.launch(server_name=host, server_port=int(port), share=True)
+gr.close_all(verbose=True)

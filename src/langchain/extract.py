@@ -7,6 +7,7 @@ TODO 接入文因大模型到信息提取链
 import asyncio
 import json
 import logging
+from abc import ABC, abstractmethod
 
 import openai
 import requests
@@ -35,6 +36,27 @@ logging.basicConfig(level=logging.INFO, format='[%(pastime)s] {%(pathname)s:%(li
                     datefmt='%H:%M:%S')
 logger.setLevel(logging.INFO)
 
+
+class LLMExtract:
+    """
+    大模型抽取类
+    """
+    def __int__(self, llm, schema, docs):
+        self.llm = llm
+        self.schema = schema
+        self.docs = docs
+
+
+class ModelSelector:
+    """模型选择器"""
+    def __int__(self, chat_models):
+        self.chat_models = chat_models
+
+    @property
+    def models(self):
+        return self.chat_models
+
+
 #
 # azure_llm = AzureChatOpenAI(
 #         deployment_name="gpt-35-turbo",
@@ -54,16 +76,26 @@ logger.setLevel(logging.INFO)
 #     top_p=1.0
 # )
 #
-openai_llm = ChatOpenAI(
-    model="gpt-3.5-turbo",
-    temperature=0,
-    max_tokens=2000,
-    frequency_penalty=0,
-    presence_penalty=0,
-    top_p=1.0,
-    request_timeout=120,
-    max_retries=10
-)
+
+class BaseModels(ABC):
+    @abstractmethod
+    def execute(self):
+        raise NotImplementedError
+
+
+class openai_gpt35(BaseModels):
+    def execute(self, **kwargs):
+
+        return ChatOpenAI(
+            model="gpt-3.5-turbo",
+            temperature=0,
+            max_tokens=2000,
+            frequency_penalty=0,
+            presence_penalty=0,
+            top_p=1.0,
+            request_timeout=120,
+            max_retries=10
+    )
 
 
 class MyModal(Modal):
@@ -114,9 +146,13 @@ def chat_mem_fin_llm(endpoint_url, input_text, task_type):
 
 
 if __name__ == '__main__':
-    llm = MyModal(endpoint_url='http://47.99.64.191:8085/api/chatglm')
-    query = '介绍下自己？'
-    prompt = PromptTemplate(input_variables=["query"], template=f'''请回答以下问题：\n{{query}}\n Output:''')
-    chain = LLMChain(llm=llm, prompt=prompt, verbose=True)
-    output = chain.run(query)
-    print(output)
+    chat_models = {"azure_gpt35": None,
+                   "azure_gpt3": None,
+                   "openai_gpt35": openai_gpt35()
+                   }
+    model = "openai_gpt35"
+    model_obj = chat_models.get(model)
+    if model_obj:
+        print(model_obj)
+    else:
+        raise f"{model}暂未接入。"

@@ -4,13 +4,17 @@ API."""
 import openai
 import uuid
 
-from web import api_type
+from openai.api_requestor import APIRequestor
+
 from data import prompt_text
 
 
-def set_openai_key(key):
+def set_openai_key(key, api_version=None, api_base='https://api.openai.com/v1', api_type='open_ai'):
     """Sets OpenAI key."""
     openai.api_key = key
+    openai.api_version = api_version
+    openai.api_type = api_type
+    openai.api_base = api_base
 
 
 class Example:
@@ -138,19 +142,21 @@ class GPT:
             q = prompt + self.output_suffix
         return q
 
-    def submit_request(self, text, task_type, context):
+    def submit_request(self, text, task_type, context, model_type):
         """Calls the OpenAI API with the specified parameters.
         """
-        response = openai.ChatCompletion.create(model=self.get_engine(),
+        response = openai.ChatCompletion.create(engine=self.get_engine() if model_type == 'azure' else None,
+                                                model=self.get_engine() if model_type == 'openai' else None,
                                                 messages=self.get_query_message(self.generate_prompt(text, task_type),
                                                                                 context=context),
                                                 max_tokens=self.get_max_tokens(),
-                                                temperature=self.get_temperature())
+                                                temperature=self.get_temperature()
+                                                )
         return response
 
-    def get_top_reply(self, text, task_type, context=''):
+    def get_top_reply(self, text, task_type, context='', model_type=''):
         """Obtains the best result as returned by the API."""
-        response = self.submit_request(text, task_type, context)
+        response = self.submit_request(text, task_type, context, model_type)
         return response.choices[0]['message']['content'], response['usage']['total_tokens']
 
     def format_example(self, ex):
