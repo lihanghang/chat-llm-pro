@@ -10,4 +10,4 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN pip install -r requirements.txt
 
 EXPOSE 9999
-CMD ["python3", "app/v2/chat_server.py"]
+CMD ["python3", "web/v2/chat_server.py"]
