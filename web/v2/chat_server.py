@@ -17,19 +17,19 @@ rootPath = os.path.split(curPath)[0]
 sys.path.insert(0, os.path.split(rootPath)[0])
 
 from src.utils.embedding import get_embedding
-from src.langchain.extract import parser_pdf, extract_doc, chat_mem_fin_llm
 from web import host, port, office_model_name, office_openai_key, api_version, api_base, api_type, azure_model_name, azure_openai_key
 from data import example, prompt_text
 from src.gpt import set_openai_key, GPT, Example
 from src.utils.data_store import doc2embedding, save_embedding
 from src.utils.doc import parser_doc, hashcode_with_file, get_file_ext_size
+from src.langchain.extract import parser_pdf, extract_doc, chat_mem_fin_llm
 
 
 model_type = 'openai'
 
 data_store_base_path = 'data/store'  # 生成文件父级目录
 store_origin_file_dir = None
-gpt:object = None
+gpt: object = None
 mem_api_base = os.getenv('MEM_FIN_OPENAI_API')
 
 
@@ -69,7 +69,7 @@ def init_store_dir(store_dir):
     logging.info("Clean store data.")
 
 
-def process_upload_file(file_tmp_path):
+def process_upload_file(file_tmp_path: list):
     """
     Receive upload file and process.
     Args:
@@ -198,7 +198,7 @@ with gr.Blocks(css="footer {visibility: hidden}", title='ChatLLM is all you need
     with gr.Tab("场景问答"):
         with gr.Row():
             with gr.Column():
-                input_text = gr.Textbox(label="我要提问", value="介绍下自己？")
+                input_text = gr.Textbox(label="我要提问", placeholder="向大模型提问……")
                 model_type = gr.Dropdown(choices=["memect", "open_ai", "azure", "all"], value='memect', label='选择模型类型')
                 task_type = gr.Radio(choices=list(prompt_text.keys()),
                                      label="场景类型", value='问答')

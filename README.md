@@ -40,6 +40,7 @@ $ docker-compose build
 - [x] 支持类chatpdf功能
 - [x] 引入langchain工具，加速应用构建
 - [ ] 基于langchin工具进行文档抽取server开发。
+- [x] 引入text2vect模型，进行词向量计算。
 
 ### 参考文档
 1. gpt-3 https://platform.openai.com/docs/models/gpt-3

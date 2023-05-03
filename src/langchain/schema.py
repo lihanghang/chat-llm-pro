@@ -1,32 +1,36 @@
+"""
+define extract schema.
+"""
+
 from kor import Object, Text
 
 info_schema = Object(
-  id="info",
-  description=(
-      "关于临时公告-停牌信息的抽取--包含了公司名称，停牌日期，停牌天数。"
-      " music by a particular artist."
-  ),
-  attributes=[
-      Text(
-          id="company_name",
-          description="公告涉及的公司名称",
-          examples=[],
-          many=True,
-      ),
-      Text(
-          id="date",
-          description="公告涉及的停牌日期",
-          examples=[],
-          many=True,
-      ),
-      Text(
-          id="day",
-          description="公告涉及的停牌天数",
-          examples=[("股票将于2021年4月27日停牌1天", "1天")],
-          many=True,
-      ),
+    id="info",
+    description=(
+        "关于临时公告-停牌信息的抽取--包含了公司名称，停牌日期，停牌天数。"
+        " music by a particular artist."
+    ),
+    attributes=[
+        Text(
+            id="company_name",
+            description="公告涉及的公司名称",
+            examples=[],
+            many=True,
+        ),
+        Text(
+            id="date",
+            description="公告涉及的停牌日期",
+            examples=[],
+            many=True,
+        ),
+        Text(
+            id="day",
+            description="公告涉及的停牌天数",
+            examples=[("股票将于2021年4月27日停牌1天", "1天")],
+            many=True,
+        ),
     ],
-  many=False,
+    many=False,
 )
 
 person_schema = Object(
@@ -81,8 +85,69 @@ person_schema = Object(
     many=True
 )
 
-#
-# txt = '''深圳市京基智农时代股份有限公司（以下简称“公司”）董事会于 2022年10月27日收到公司董事陈家俊先生提交的书面辞职信，陈家俊先生因个人原因辞
-# 去公司第十届董事会董事职务。辞职以后，陈家俊先生不再担任公司任何职务。截至本公告披露日，陈家俊先生未持有公司股份。
-# 董事会于近日收到公司董事刘宏伟先生的书面辞职申请，刘宏伟博士因退休原因申请辞去公司第九届董事会董事职务，辞职后不在公司担任任何职务。'''
-
+medical_event_schema = Object(
+    id="medical",
+    description=(
+        '''从医疗领域文本中抽取时间time，事件名称event和描述信息description。比如：
+        [
+            {
+              "time": "2025年3月19日",
+              "event": "就诊",
+              "description": "因咽喉疼痛来门诊就诊"
+             },
+            {
+              "time": "",
+              "event": "诊断",
+              "description": "上呼吸道感染"
+             },
+        {
+          "time": "",
+          "event": "治疗",
+          "description": "静脉滴注0.9%氯化钠注射液250ml，注射用乳糖酸JQKA0.25g"
+         },
+        {
+          "time": "输液50ml时",
+          "event": "药品不良事件",
+          "description": "恶心，呕吐症状"
+         },
+        
+        {
+          "time": "",
+          "event": "治疗药品不良事件",
+          "description": "立即停止用药，给予肌肉注射地塞米松5mg"
+         },
+        {
+          "time": "10分钟后",
+          "event": "转归",
+          "description": "症状缓解"
+         } ]'''),
+    attributes=[
+        Text(
+            id="time",
+            description="事件的发生时间。如20分钟后，30分钟后，2030年11月08日上午8:00等",
+            examples=[],
+            many=False
+        ),
+        Text(
+            id="event",
+            description="事件的名称。如就诊，体检，药品不良事件，治疗药品不良事件，操作，出院，转归等。",
+            examples=[("因肺炎", "就诊")],
+            many=False,
+        ),
+        Text(
+            id="description",
+            description="事件的具体内容。",
+            examples=[],
+            many=False,
+        )
+    ],
+    examples=[
+        ('''该患于2025年8月18日，因“咽喉痛、发热”来我诊所就诊''',
+         {
+             "time": "2025年8月18日",
+             "event": "就诊",
+             "description": "因“咽喉痛、发热”来我诊所就诊"
+         })
+    ],
+    many=True
+)

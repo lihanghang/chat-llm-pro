@@ -1,7 +1,6 @@
 import hashlib
 import json
 
-import openai
 import requests
 import zipfile
 import io
@@ -111,13 +110,13 @@ def parser_doc(input_file_path, store_origin_file_dir):
                         output_dir=convert_pdf_dir, _async='false')
 
             # pdf2doc
-            query = {'text': 'true', 'output-format': 'zip', 'html': 'true'}
+            query = {'text': 'true', 'output-format': 'zip', 'html': 'false'}
             request_api(base_url=base_url, endpoint=pdf2doc, filename=convert_pdf_dir, params=query,
                         output_dir=store_origin_file_dir, output_format='zip')
             return f'{store_origin_file_dir}/table.txt'
         elif ext in ['.pdf']:
             # pdf2doc 生成文本内容
-            query = {'text': 'true', 'output-format': 'zip', 'html': 'true'}
+            query = {'text': 'true', 'output-format': 'zip', 'html': 'false'}
             request_api(base_url=base_url, endpoint=pdf2doc, filename=input_file_path, params=query,
                         output_dir=store_origin_file_dir, output_format='zip')
             return f'{store_origin_file_dir}/table.txt'
@@ -204,5 +203,4 @@ if __name__ == '__main__':
     doc_result = []
     for item in doc_obj[DocField.ITEMS.value]:
         doc_result.append(DocContent(item[DocField.TYPE.value], item[DocField.PAGE_NUMBER.value], item[DocField.TEXT.value]))
-
     print(doc_result[0].text)
