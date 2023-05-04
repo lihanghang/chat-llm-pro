@@ -39,7 +39,7 @@ $ docker-compose build
 - [x] 支持选择模型
 - [x] 支持类chatpdf功能
 - [x] 引入langchain工具，加速应用构建
-- [ ] 基于langchin工具进行文档抽取server开发。
+- [x] 基于langchain工具进行文档抽取server开发。可通过服务实现文本抽取。
 - [x] 引入text2vect模型，进行词向量计算。
 
 ### 参考文档
