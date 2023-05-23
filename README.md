@@ -16,7 +16,7 @@ source venv/bin/activate
 ## 编译镜像
 
 ```shell
-$ docker-compose build
+$ docker-compose -f chat_docker-compose build
 ```
 
 ## Web UI
@@ -41,6 +41,7 @@ $ docker-compose build
 - [x] 引入langchain工具，加速应用构建
 - [x] 基于langchain工具进行文档抽取server开发。可通过服务实现文本抽取。
 - [x] 引入text2vect模型，进行词向量计算。
+- [ ] web v3版本引入vue3，实现文档级别的问答。（长远计划）
 
 ### 参考文档
 1. gpt-3 https://platform.openai.com/docs/models/gpt-3

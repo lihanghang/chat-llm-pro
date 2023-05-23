@@ -13,6 +13,5 @@ def test_qdrant():
                                ),)
 
 
-
 print(client)
 test_qdrant()
