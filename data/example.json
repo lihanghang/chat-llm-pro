@@ -37,5 +37,16 @@
       "| 产品名称 | 规格 | 数量 | 单价 | 金额 | 备注 |\n| --- | --- | --- | --- | --- | --- |\n| 笔记本电脑 | Thinkpad | 10 | 5000 | 50000 |  |\n| 服务器主机 | 华为 | 1 | 168000 | 168000 |  |\n| 合计金额 |  |  |  | 218000 |  |",
       "事件抽取"
     ]
-  ]
+  ],
+
+   "extract": [
+     [
+       "股票简称：*ST银亿 股票代码：000981 公告编号：2022-082\n银亿股份有限公司\n关于公司董事会秘书辞职的公告\n本公司董事会全体成员保证公告内容的真实、准确和完整，没有虚假记载、误导性陈述或\n者重大遗漏。\n近日，银亿股份有限公司（以下简称“公司”）董事会收到公司董事\n会秘书赵姝女士提交的书面辞职报告。赵姝女士因个人原因提出辞去公司\n董事会秘书职务，辞职后暂时仍在公司工作。截至本公告披露日，赵姝女\n士未持有公司股票。\n根据《公司法》、《深圳证券交易所上市公司自律监管指引第 1 号——\n主板上市公司规范运作》等法律法规及《公司章程》的有关规定，赵姝女\n士的辞职自辞职报告送达公司董事会时生效。公司对赵姝女士在任职期间\n为公司发展所做出的贡献表示衷心的感谢。\n为保证董事会工作的正常运行，在未正式聘任新任董事会秘书期间，\n公司董事长叶骥先生将代行董事会秘书职责，公司将按照相关规定尽快完\n成董事会秘书的选聘工作。公司董事长代行董事会秘书职责期间联系方式",
+       "Object(\n    id=\"person\",\n    description=(\n        \"关于临时公告-辞职或选举信息的提取--包含了辞职日期，辞职人姓名，辞职人原因，辞去职务，辞职后是否还担任职务，是否持有股份信息，推理出辞职人的性别。\"\n    ),\n    attributes=[\n      Text(\n            id=\"stock_num\",\n              description=\"证券代码或股票代码\",\n            examples=[],\n            many=False\n        ),\n      Text(\n            id=\"stock_name\",\n            description=\"证券简称\",\n            examples=[],\n            many=False\n        ),\n        Text(\n            id=\"name\",\n            description=\"辞职人姓名，带上称谓词\",\n            examples=[],\n            many=False\n        ),\n        Text(\n            id=\"date\",\n            description=\"包含了辞职日期\",\n            examples=[(\"近日\", \"近日\")],\n            many=False,\n        ),\n        Text(\n            id=\"position\",\n            description=\"辞去职务\",\n            examples=[],\n            many=False,\n        ),\n        Text(\n            id=\"reason\",\n            description=\"辞职人原因\",\n            examples=[],\n            many=False,\n        ),\n        Text(\n            id=\"after_position\",\n            description=\"辞职后是否还担任职务\",\n            examples=[],\n            many=False,\n        ),\n        Text(\n            id=\"share\",\n            description=\"是否持有股份\",\n            examples=[],\n            many=False,\n        ),\n        Text(\n            id=\"sex\",\n            description=\"性别，根据辞职人的姓名称谓推理出性别为男、女或空\",\n            examples=[(\"先生\", \"男\"), (\"女士\", \"女\"), (\"博士\", \"\")],\n            many=False,\n        ),\n        Text(\n            id=\"effective_time\",\n            description=\"辞职生效时间\",\n            examples=[],\n            many=False,\n        ),\n        Text(\n            id=\"excutor_name\",\n            description=\"职务代行人姓名，带上姓名的称谓\",\n            examples=[],\n            many=False,\n        )\n      \n    ],\n    many=True\n)"
+     ],
+     [
+       "| 行业 | 笔数 | 应收账款余额 | 余额占比 |\n| ---- | ---- | ------------ | -------- |\n| 电力，热力生产和供应业 | 4 | 27938.97 | 30.75% |\n| 土木工程建筑业 | 3 | 21395.21 | 23.54% |\n| 商务服务业 | 3 | 17994.04 | 19.8% |\n| 道路运输业 | 1 | 9894.84 | 10.89% |\n| 公共设施管理业 | 1 | 8455.68 | 9.31% |\n| 研究和试验发展 | 1 | 3919.26 | 4.31% |\n| 科技维广和应用服务业 | 1 | 1274.32 | 1.40% |\n| 合计 | 14 | 90872.33 | 100.00% |",
+       "Object(\n    id=\"report\",\n    description=(\"抽取表格数据，合计的数据也需要抽取\"),\n    attributes=[\n      Text(\n            id=\"industry\",\n            description=\"行业\",\n            examples=[],\n            many=False\n        ),\n      Text(\n            id=\"amount\",\n            description=\"应收账款余额\",\n            examples=[],\n            many=False\n        )\n],\n  many=True\n)"
+     ]
+   ]
 }

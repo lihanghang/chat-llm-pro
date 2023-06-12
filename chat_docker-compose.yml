@@ -5,7 +5,7 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile
-    image: chat_llm:0.0.2
+    image: chat_llm:0.0.3
     env_file:
       - .env
     volumes:

@@ -4,7 +4,7 @@ import json
 
 """Load App example data"""
 with open('data/example.json', 'r') as f:
-    example = json.load(f)['example']
+    example = json.load(f)
 
 """Load prompt data"""
 with open('data/prompt.json', 'r') as f:

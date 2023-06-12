@@ -185,9 +185,11 @@ def task_with_chat(input_txt, task, model_type):
         gr.Error(e)
 
 
-def extract_chain(file_path, schema, model_type):
-    docs = parser_pdf(file_path)
-    ret = extract_doc(schema, model_type, docs)
+def extract_chain(docs, schema, model_type='azure'):
+    # docs = parser_pdf(file_path)
+    from kor import Object, Text, Number
+    logging.info(schema)
+    ret = extract_doc(eval(schema), model_type, docs)
     return ret
 
 
@@ -207,7 +209,7 @@ with gr.Blocks(css="footer {visibility: hidden}", title='ChatLLM is all you need
             with gr.Column():
                 output_ret = gr.Text(label='输出', lines=8)
         submit.click(fn=task_with_chat, inputs=[input_text, task_type, model_type], outputs=output_ret)
-        gr.Examples(example, [input_text, task_type])
+        gr.Examples(example['example'], [input_text, task_type])
 
     with gr.Tab("MemChatDoc（文档问答）"):  # 根据文档进行提问
         def add_file(history, doc):
@@ -255,5 +257,21 @@ with gr.Blocks(css="footer {visibility: hidden}", title='ChatLLM is all you need
         submit_example.click(fn=add_examples, inputs=[question, answer], outputs=result)
         clean_example.click(del_all_examples, inputs=[], outputs=result)
 
+    with gr.Tab("文档抽取"):
+        file_output = gr.Text(label="文档预处理结果")
+        # 先支持从文本中抽取
+        upload_btn = gr.UploadButton("Upload a pdf file.", file_types=[".pdf", ".doc", ".txt"])
+        upload_btn.upload(parser_pdf, upload_btn, file_output)
+        # 定义schema和抽取提示词
+        # model_prompt = gr.Text(label="模型提示")
+        schema = gr.Code(label="input extract schema(id使用英文命名)", language='python')
+        out_ret = gr.JSON(label="result")
+        # extract_result = gr.TextArea(label="抽取结果输出")
+        model_type = gr.Dropdown(choices=["memect", "azure"], value='memect', label='选择模型')
+        extract_btn = gr.Button("extract")
+        extract_btn.click(extract_chain, [file_output, schema, model_type], out_ret)
+        gr.Examples(example['extract'], [file_output, schema])
+
+
 init_store_dir(data_store_base_path)
-demo.launch(server_name=host, server_port=int(port), share=False)
+demo.launch(server_name=host, server_port=int(port), share=True)
