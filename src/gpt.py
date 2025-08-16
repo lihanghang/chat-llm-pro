@@ -4,8 +4,6 @@ API."""
 import openai
 import uuid
 
-from openai.api_requestor import APIRequestor
-
 from data import prompt_text
 
 
