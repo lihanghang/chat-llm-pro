@@ -21,3 +21,4 @@ tests/doc.json
 tests/chat_task.py
 web/v3/chatllm/.vscode
 web/v3/chatllm/node_modules
+.venv
