@@ -3,7 +3,8 @@ name = "chat-llm-pro"
 version = "0.1.0"
 description = "大模型应用试验场"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12, <3.13"
+
 dependencies = [
     "flask>=3.1.1",
     "httpx>=0.28.1",
@@ -18,7 +19,8 @@ dependencies = [
     "qdrant_client>=1.1.7",
     "Requests>=2.30.0",
     "tqdm>=4.65.0",
-    "langchain-community>=0.3.27",
+    "sentence-transformers>=5.1.0",
+    "langchain-community",
 ]
 
 
